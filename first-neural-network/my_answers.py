@@ -91,27 +91,34 @@ class NeuralNetwork(object):
 
         # X = np.reshape(X,[-1,len(X)])
         # y = np.reshape(y,[-1,1])
-        
+
         # TODO: Output error - Replace this value with your calculations.
         error = y - final_outputs # Output layer error is the difference between desired target and actual output.
         
         # TODO: Backpropagated error terms - Replace these values with your calculations.
-        output_error_term = error * 1
+        output_error_term = error # *1 because linear activation at final outputs
         
+        # print("Hidden output.T:{}, output_error_term:{}".format(hidden_outputs.T.shape,output_error_term.shape))
+
+        # Weight step (hidden to output)    
+        delta_weights_h_o += np.matmul(hidden_outputs.T, output_error_term) 
+
+
         # TODO: Calculate the hidden layer's contribution to the error
-        hidden_error = output_error_term * self.weights_hidden_to_output.T 
+        hidden_error = np.matmul(output_error_term,self.weights_hidden_to_output.T )
         
         
         
         hidden_error_term = hidden_error * hidden_outputs * (1-hidden_outputs)
         
         # Weight step (input to hidden)
+        # delta_weights_i_h += np.matmul(hidden_error_term.T, X).T
         delta_weights_i_h += np.matmul(X.T, hidden_error_term)
-        # Weight step (hidden to output)
-        delta_weights_h_o += np.matmul(output_error_term, hidden_outputs).T 
 
-        # print("hidden_error:{}, hidden_error_term:{}, delta_weights_i_h:{}, delta_weights_h_o:{}".format(hidden_error.shape,hidden_error_term.shape,
-        #     delta_weights_i_h.shape, delta_weights_h_o.shape))
+        # print("hidden outputs:{}".format(hidden_outputs.shape))
+        # print("weights_input_to_hidden:{}, weights_hidden_to_output:{}".format(self.weights_input_to_hidden.shape,self.weights_hidden_to_output.shape))
+        # print("error:{}, hidden_error:{}, hidden_error_term:{}, output_error_term:{}, delta_weights_i_h:{}, delta_weights_h_o:{}".format(error.shape, hidden_error.shape,hidden_error_term.shape,
+        #     output_error_term.shape,delta_weights_i_h.shape, delta_weights_h_o.shape))
         # print("X :{}, y:{}".format(X.shape, y.shape))
 
         return delta_weights_i_h, delta_weights_h_o
@@ -152,7 +159,7 @@ class NeuralNetwork(object):
 #########################################################
 # Set your hyperparameters here
 ##########################################################
-iterations = 1000
-learning_rate = 0.1
-hidden_nodes = 60
+iterations = 6000
+learning_rate = 0.05
+hidden_nodes = 70
 output_nodes = 1
