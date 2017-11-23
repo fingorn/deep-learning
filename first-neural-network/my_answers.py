@@ -45,8 +45,8 @@ class NeuralNetwork(object):
         delta_weights_i_h = np.zeros(self.weights_input_to_hidden.shape)
         delta_weights_h_o = np.zeros(self.weights_hidden_to_output.shape)
         for X, y in zip(features, targets):
-            X = np.reshape(X,[-1,len(X)])
-            y = np.reshape(y,[-1,1])
+            # X = np.reshape(X,[len(X),1])
+            # y = np.reshape(y,[1,1])
 
             final_outputs, hidden_outputs = self.forward_pass_train(X)  # Implement the forward pass function below
             # Implement the backproagation function below
@@ -99,21 +99,23 @@ class NeuralNetwork(object):
         output_error_term = error # *1 because linear activation at final outputs
         
         # print("Hidden output.T:{}, output_error_term:{}".format(hidden_outputs.T.shape,output_error_term.shape))
+        # print("Hidden output[:,None]:{}".format(hidden_outputs[:,None].shape))
 
         # Weight step (hidden to output)    
-        delta_weights_h_o += np.matmul(hidden_outputs.T, output_error_term) 
-
+        # delta_weights_h_o += np.matmul(hidden_outputs.T, output_error_term) 
+        delta_weights_h_o += output_error_term * hidden_outputs[:,None]
 
         # TODO: Calculate the hidden layer's contribution to the error
         hidden_error = np.matmul(output_error_term,self.weights_hidden_to_output.T )
         
-        
+                
         
         hidden_error_term = hidden_error * hidden_outputs * (1-hidden_outputs)
         
         # Weight step (input to hidden)
         # delta_weights_i_h += np.matmul(hidden_error_term.T, X).T
-        delta_weights_i_h += np.matmul(X.T, hidden_error_term)
+        # delta_weights_i_h += np.matmul(X.T, hidden_error_term)
+        delta_weights_i_h += hidden_error_term * X[:,None] 
 
         # print("hidden outputs:{}".format(hidden_outputs.shape))
         # print("weights_input_to_hidden:{}, weights_hidden_to_output:{}".format(self.weights_input_to_hidden.shape,self.weights_hidden_to_output.shape))
@@ -159,7 +161,7 @@ class NeuralNetwork(object):
 #########################################################
 # Set your hyperparameters here
 ##########################################################
-iterations = 6000
-learning_rate = 0.05
-hidden_nodes = 70
+iterations = 4500
+learning_rate = 0.4
+hidden_nodes = 30
 output_nodes = 1
